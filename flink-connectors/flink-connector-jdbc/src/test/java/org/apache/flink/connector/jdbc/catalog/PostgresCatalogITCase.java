@@ -20,6 +20,7 @@ package org.apache.flink.connector.jdbc.catalog;
 
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
+import org.apache.flink.table.api.ValidationException;
 import org.apache.flink.table.planner.runtime.utils.TableEnvUtil;
 import org.apache.flink.types.Row;
 
@@ -81,7 +82,7 @@ public class PostgresCatalogITCase extends PostgresCatalogTestBase {
 		assertEquals("[1]", results.toString());
 	}
 
-	@Test
+	@Test(expected = ValidationException.class)
 	public void testGroupByInsert() {
 		TableEnvironment tEnv = getTableEnvWithPgCatalog();
 
@@ -89,11 +90,22 @@ public class PostgresCatalogITCase extends PostgresCatalogTestBase {
 			tEnv,
 			String.format(
 				"insert into `%s` " +
-					"select `int`, cast('A' as bytes), `short`, max(`long`), max(`real`), " +
-					"max(`double_precision`), max(`numeric`), max(`boolean`), max(`text`), " +
-					"'B', 'C', max(`character_varying`), " +
-					"max(`timestamp`), max(`date`), max(`time`), max(`default_numeric`) " +
-					"from `%s` group by `int`, `short`",
+					"select `int`, " +
+					"cast('A' as bytes), " +
+					"`short`, max(`long`), " +
+					"max(`real`), " +
+					"max(`double_precision`), " +
+					"max(`numeric`)," +
+					"max(`boolean`), " +
+					"max(`text`), " +
+					"'B', " +
+					"'C', " +
+					"max(`character_varying`), " +
+					"max(`timestamp`), " +
+					"max(`date`), " +
+					"max(`time`), " +
+					"max(`default_numeric`) " +
+					"FROM `%s` GROUP BY `int`, `short`",
 				TABLE_PRIMITIVE_TYPE2,
 				TABLE_PRIMITIVE_TYPE));
 
